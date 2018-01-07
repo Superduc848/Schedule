@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Schedule
+{% endblock %}
+
+{% block main %}
+    <head>
+		<!-- https://github.com/dbunic/REDIPS_drag -->
+		<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet"/>
+		<script src="{{ url_for('static', filename='redips-drag-min.js') }}"></script>
+		<script src="{{ url_for('static', filename='script.js') }}"></script>
+		<title>Testing 123</title>
+	</head>
+    <form action="{{ url_for('schedule') }}" method="post">
+    	<fieldset>
+			<body onload="REDIPS.drag.init()">
+				<!-- tables inside this DIV could have drag-able content -->
+				<div id="redips-drag">
+					<!-- left container -->
+					<div id="left">
+						<table id="table1">
+							<colgroup>
+								<col width="100"/>
+							</colgroup>
+							<tr>
+								<td class="redips-single">
+									<div id="a" class="redips-drag redips-clone orange">A</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="redips-single">
+									<div id="b" class="redips-drag redips-clone green">B</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="redips-single">
+									<div id="c" class="redips-drag redips-clone blue">C</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="redips-trash">Trash</td>
+							</tr>
+						</table>
+					</div>
+
+					<!-- right container -->
+					<div id="right">
+						<table id="table2">
+							<colgroup>
+								<col width="100"/> <!--  first activity column -->
+								<col width="100"/> <!--  second activity column -->
+							</colgroup>
+							<tr>
+								<td id="td1"></td>
+								<td id="td2"></td>
+							</tr>
+							<tr>
+								<td id="td3"></td>
+								<td id="td4"></td>
+							</tr>
+						</table>
+					</div>
+
+					<!-- display block content -->
+					<div id="message"/>
+				</div>
+			</body>
+		</fieldset>
+	</form>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Rigs
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('rigs') }}" method="post">
+        <fieldset>
+            <div class="container">
+              <h2>Add/Edit Rigs</h2>
+              <p>This screen should allow for adding new rigs or editing properties of existing rigs</p>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Rig Name</th>
+                    <th scope="col">Number of Techs per Tower</th>
+                    <th scope="col">Latitude</th>
+                    <th scope="col">Longitude</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    {% for rig in riglist %}
+                    <td><input type="button"   value="{{ rig.rig_name }}" name="rigname" onclick="window.location.href='{{ url_for('editrig') }}?rig={{ rig.rig_name }}'"></td>
+                    <td>{{ rig.num_techs }}</td>
+                    <td>{{ rig.latitude }}</td>
+                    <td>{{ rig.longitude }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-outline-primary" onclick="window.location.href='{{ url_for('addrig') }}'">Add Rig</button>
+        </fieldset>
+    </form>
+{% endblock %}

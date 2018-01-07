@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Rig
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('editrig') }}" method="post">
+        <fieldset>
+            <div class="container">
+                <h2>Edit Rig</h2>
+                <p>This screen should allow for editing rig properties</p>
+            </div>
+            <div class="form-group row">
+                <legend>{{ riginfo[0].rig_name }}</legend>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="inputDefault">Rig Name</label>
+                <input class="form-control" placeholder="{{ riginfo[0].rig_name }}" id="rigname" name="rigname" type="text" value="{{ riginfo[0].rig_name }}">
+            </div>
+            <div class="form-group">
+                <label for="num_tecsselect">Number of Techs assigned</label>
+                <select class="form-control" id="numtechs" name="numtechs">
+                    <option selected="selected"> {{ riginfo[0].num_techs }}</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="inputDefault">Latitude</label>
+                <input class="form-control" placeholder="{{ riginfo[0].latitude }}" id="lat" name="lat" type="text" value="{{ riginfo[0].latitude }}">
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="inputDefault">Longitude</label>
+                <input class="form-control" placeholder="{{ riginfo[0].longitude }}" id="long" name="long" type="text" value="{{ riginfo[0].longitude }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-outline-danger" name="remove_rig" value="rmv">Remove Rig</button>
+        </fieldset>
+    </form>
+{% endblock %}
