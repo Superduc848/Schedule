@@ -23,23 +23,15 @@
 							<colgroup>
 								<col width="100"/>
 							</colgroup>
+							{% for techs in sched %}
 							<tr>
 								<td class="redips-single">
-									<div id="a" class="redips-drag redips-clone orange">A</div>
+									<div id="a" class="redips-drag redips-clone blue">{{ techs.first_name }}</div>
 								</td>
 							</tr>
+							{% endfor %}
 							<tr>
-								<td class="redips-single">
-									<div id="b" class="redips-drag redips-clone green">B</div>
-								</td>
-							</tr>
-							<tr>
-								<td class="redips-single">
-									<div id="c" class="redips-drag redips-clone blue">C</div>
-								</td>
-							</tr>
-							<tr>
-								<td class="redips-trash">Trash</td>
+								<td class="redips-trash">Remove</td>
 							</tr>
 						</table>
 					</div>
@@ -50,15 +42,24 @@
 							<colgroup>
 								<col width="100"/> <!--  first activity column -->
 								<col width="100"/> <!--  second activity column -->
+								<col width="100"/>
+								<col width="100"/>
 							</colgroup>
 							<tr>
+								<td class="redips-mark dark">Rig</td>
+								<td class="redips-mark dark">Days</td>
+								<td class="redips-mark dark">Nights</td>
+								<td class="redips-mark dark">Other</td>
+							</tr>
+							{% for rigs in sched %}
+							<tr>
+								<td class="redips-mark dark">{{ rigs.rig_name }}</td>
 								<td id="td1"></td>
 								<td id="td2"></td>
-							</tr>
-							<tr>
 								<td id="td3"></td>
 								<td id="td4"></td>
 							</tr>
+							{% endfor %}
 						</table>
 					</div>
 

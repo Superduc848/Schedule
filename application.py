@@ -25,6 +25,9 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# testing solution from stackoverflow
+app.config['TRAP_BAD_REQUEST_ERRORS'] = True
+
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///sr.db")
 
@@ -59,7 +62,7 @@ def login():
             return apology("invalid username and/or password")
 
         # remember which user has logged in
-        session["user_id"] = rows[0]["userid"]
+        session["user_id"] = rows[0]["user_id"]
 
         # redirect user to home page
         return redirect(url_for("index"))
@@ -90,13 +93,13 @@ def register():
             return apology("passwords do not match")
 
         # check if username already exists in db
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        rows = db.execute("SELECT * FROM users WHERE user_name = :username", username=request.form.get("username"))
         for row in rows:
             if len(rows) != 0:
                 return apology("username taken, please try again")
 
         # store new username and hashed password in database
-        db.execute("INSERT INTO users (username, hash) VALUES(:username, :pword)",
+        db.execute("INSERT INTO users (user_name, hash) VALUES(:username, :pword)",
         username = request.form["username"],
         pword = pwd_context.hash(request.form["password"]))
 
@@ -134,26 +137,28 @@ def editrig():
 
     if request.method =="GET":
         # get rig name from rigs table
-        rigname = request.args.get("rig")
+        rig_id = request.args.get("rig")
 
         # get existing info from db to fill editrig form
-        riginfo = db.execute("SELECT * FROM rigs WHERE rig_name = :rigname",
-        rigname = rigname)
+        riginfo = db.execute("SELECT * FROM rigs WHERE rig_id = :rig_id",
+        rig_id = rig_id)
 
         # render editrig
         return render_template("editrig.html",
-        rigname = rigname,
         riginfo = riginfo)
 
     if request.method =="POST":
-        if request.form["remove_rig"] == "rmv":
-            db.execute("DELETE FROM rigs WHERE rig_name=:rigname",
-            rigname = request.form.get("rigname"))
+        # print(request.form) # for testing purposes
+        if request.form["submit"] == "remove":
+            db.execute("DELETE FROM rigs WHERE rig_id=:rig_id",
+            rig_id = rig_id) # fix this - need to get rig name from somewhere
+        #elif request.form["submit"] == "update": this statement works but doesnt provide rig ID
         else:
+            rig_id = request.form["submit"] # get the rig_id from the value of the submit button in editrig.html
             # update rigs db with info from editrig form
-            db.execute("UPDATE rigs SET num_techs=:num_techs, latitude=:latitude, longitude=:longitude WHERE rig_name=:rigname",
-            rigname = request.form.get("rigname"),
-            num_techs = request.form.get("numtechs"),
+            db.execute("UPDATE rigs SET num_techs=:num_techs, latitude=:latitude, longitude=:longitude WHERE rig_id=:rig_id",
+            rig_id = rig_id,
+            num_techs = request.form.get("num_techs"),
             latitude = request.form.get("lat"),
             longitude = request.form.get("long"))
 
@@ -176,33 +181,24 @@ def addrig():
 
         return redirect("/rigs")
 
-@app.route("/schedule", methods=["GET", "POST"])
-@login_required
-def schedule():
-
-    if request.method =="GET":
-        # render
-        return render_template("schedule.html")
-
-    if request.method =="POST":
-
-        return redirect("/rigs")
-
 @app.route("/techs", methods=["GET", "POST"])
 @login_required
 def techs():
 
     if request.method =="GET":
         # get data from techs table and users table
-        techdetail = db.execute("SELECT * FROM users INNER JOIN techs ON techs.userid = users.userid, rigs ON rigs.rig_id = techs.rig_id ORDER BY last_name")
+        techdetail = db.execute("SELECT * FROM users ORDER BY last_name")
 
         # render
         return render_template("techs.html",
         techdetail = techdetail)
 
     if request.method =="POST":
+        techdetail = db.execute("SELECT * FROM users ORDER BY last_name")
 
-        return redirect("/techs")
+        return render_template("techs.html",
+        techdetail = techdetail)
+
 
 @app.route("/edit_tech", methods=["GET", "POST"])
 @login_required
@@ -210,44 +206,70 @@ def edit_tech():
 
     if request.method =="GET":
         # get rig name from rigs table
-        rigname = request.args.get("rig")
+        user_id = request.args.get("id")
 
         # get existing info from db to fill editrig form
-        riginfo = db.execute("SELECT * FROM rigs WHERE rig_name = :rigname",
-        rigname = rigname)
+        techinfo = db.execute("SELECT * FROM users INNER JOIN rigs ON rigs.rig_name = users.rig_name WHERE user_id=:user_id",
+        user_id = user_id)
+
+        rignames = db.execute("SELECT rig_name FROM rigs")
 
         # render editrig
-        return render_template("editrig.html",
-        rigname = rigname,
-        riginfo = riginfo)
+        return render_template("edit_tech.html",
+        techinfo = techinfo,
+        rignames = rignames)
 
     if request.method =="POST":
-        if request.form["remove_rig"] == "rmv":
-            db.execute("DELETE FROM rigs WHERE rig_name=:rigname",
-            rigname = request.form.get("rigname"))
+        if request.form["submit"] == "remove":
+            db.execute("DELETE FROM users WHERE user_id=:user_id",
+            user_id = request.form.get("user_id"))
         else:
+            user_id = request.form["submit"]
             # update rigs db with info from editrig form
-            db.execute("UPDATE rigs SET num_techs=:num_techs, latitude=:latitude, longitude=:longitude WHERE rig_name=:rigname",
-            rigname = request.form.get("rigname"),
-            num_techs = request.form.get("numtechs"),
-            latitude = request.form.get("lat"),
-            longitude = request.form.get("long"))
+            db.execute("UPDATE users SET phone=:phone, email=:email, rig_name=:rig_name, rotation=:rotation, pro_lvl=:pro_lvl WHERE user_id=:user_id",
+            phone = request.form.get("phone"),
+            email = request.form.get("email"),
+            rig_name = request.form.get("rig_name"),
+            rotation = request.form.get("rotation"),
+            pro_lvl = request.form.get("pro_lvl"),
+            user_id = user_id)
 
-        return redirect("/rigs")
+        return redirect("/techs")
 
 @app.route("/addtech", methods=["GET", "POST"])
 @login_required
 def addtech():
 
     if request.method =="GET":
-        return render_template("addtech.html")
+        rignames = db.execute("SELECT rig_name FROM rigs") # get rig names for select element
+        return render_template("addtech.html",
+        rignames = rignames)
 
     if request.method =="POST":
         # add new rig info to the rigs db
-        db.execute("INSERT INTO rigs (rig_name, num_techs, latitude, longitude) VALUES (:rigname, :num_techs, :latitude, :longitude)",
-        rigname = request.form.get("rigname"),
-        num_techs = request.form.get("numtechs"),
-        latitude = request.form.get("lat"),
-        longitude = request.form.get("long"))
+        db.execute("INSERT INTO users (first_name, last_name, phone, email, rotation, rig_name, pro_lvl) VALUES (:fname, :lname, :phone, :email, :rotation, :rig_name, :pro_lvl)",
+        fname = request.form.get("first_name"),
+        lname = request.form.get("last_name"),
+        phone = request.form.get("phone"),
+        email = request.form.get("email"),
+        rotation = request.form.get("rotation"),
+        rig_name = request.form.get("rig_name"),
+        pro_lvl = request.form.get("pro_lvl"))
 
         return redirect("/techs")
+
+@app.route("/schedule", methods=["GET", "POST"])
+@login_required
+def schedule():
+
+    if request.method =="GET":
+        # get data from tables: users, techs, rigs
+        sched = db.execute("SELECT * FROM users INNER JOIN rigs ON rigs.rig_id = users.rigid ORDER BY last_name")
+
+        # render
+        return render_template("schedule.html",
+        sched = sched)
+
+    if request.method =="POST":
+
+        return redirect("/rigs")

@@ -24,8 +24,8 @@
                 <tbody>
                     <tr>
                     {% for tech in techdetail %}
-                    <td><input type="button"   value="{{ tech.last_name }}" name="tech" onclick="window.location.href='{{ url_for('edit_tech') }}?id={{ tech.userid }}'"></td>
-                    <td>{{ tech.rotation }}</td>
+                    <td><input type="button"   value="{{ tech.first_name }} {{ tech.last_name }}" name="tech" onclick="window.location.href='{{ url_for('edit_tech') }}?id={{ tech.user_id }}'"></td>
+                    <td>Set - {{ tech.rotation }}</td>
                     <td>{{ tech.rig_name }}</td>
                     <td>{{ tech.phone }}</td>
                     <td>{{ tech.shift }}</td>

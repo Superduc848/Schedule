@@ -15,12 +15,8 @@
                 <legend>{{ riginfo[0].rig_name }}</legend>
             </div>
             <div class="form-group">
-                <label class="col-form-label" for="inputDefault">Rig Name</label>
-                <input class="form-control" placeholder="{{ riginfo[0].rig_name }}" id="rigname" name="rigname" type="text" value="{{ riginfo[0].rig_name }}">
-            </div>
-            <div class="form-group">
                 <label for="num_tecsselect">Number of Techs assigned</label>
-                <select class="form-control" id="numtechs" name="numtechs">
+                <select class="form-control" id="numtechs" name="num_techs">
                     <option selected="selected"> {{ riginfo[0].num_techs }}</option>
                     <option>1</option>
                     <option>2</option>
@@ -31,14 +27,14 @@
             </div>
             <div class="form-group">
                 <label class="col-form-label" for="inputDefault">Latitude</label>
-                <input class="form-control" placeholder="{{ riginfo[0].latitude }}" id="lat" name="lat" type="text" value="{{ riginfo[0].latitude }}">
+                <input class="form-control" placeholder="{{ riginfo[0].latitude }}" name="lat" type="text" value="{{ riginfo[0].latitude }}">
             </div>
             <div class="form-group">
                 <label class="col-form-label" for="inputDefault">Longitude</label>
-                <input class="form-control" placeholder="{{ riginfo[0].longitude }}" id="long" name="long" type="text" value="{{ riginfo[0].longitude }}">
+                <input class="form-control" placeholder="{{ riginfo[0].longitude }}" name="long" type="text" value="{{ riginfo[0].longitude }}">
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
-            <button type="submit" class="btn btn-outline-danger" name="remove_rig" value="rmv">Remove Rig</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="{{ riginfo[0].rig_id }}">Update</button>
+            <button type="submit" class="btn btn-outline-danger" name="submit" value="remove">Remove Rig</button>
         </fieldset>
     </form>
 {% endblock %}

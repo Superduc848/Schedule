@@ -22,7 +22,7 @@
                 <tbody>
                     <tr>
                     {% for rig in riglist %}
-                    <td><input type="button"   value="{{ rig.rig_name }}" name="rigname" onclick="window.location.href='{{ url_for('editrig') }}?rig={{ rig.rig_name }}'"></td>
+                    <td><input type="button"   value="{{ rig.rig_name }}" name="rigname" onclick="window.location.href='{{ url_for('editrig') }}?rig={{ rig.rig_id }}'"></td>
                     <td>{{ rig.num_techs }}</td>
                     <td>{{ rig.latitude }}</td>
                     <td>{{ rig.longitude }}</td>
