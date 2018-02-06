@@ -67,7 +67,7 @@ div#redips-drag table {
 		padding: 0px;
 	}
 	table#table1 td {
-		height: 60px;
+		height: 40px;
 	}
 	table#table2 td {
 		height: 40px;
@@ -103,4 +103,20 @@ div#redips-drag table {
 	color: white;
 	background-color: SteelBlue;
 	height: 26px;
+}
+
+/* DIV row handlers (blue left column) */
+.redips-row {
+	width: 20px;
+	margin: 2px;
+	border-color: SteelBlue;
+	background-color: SteelBlue;
+	/* round corners */
+	border-radius: 14px; /* Opera, Chrome */
+	-moz-border-radius: 14px; /* FF */
+}
+
+/* row handler TD background color */
+.redips-rowhandler {
+	background-color: #76ACDA;
 }

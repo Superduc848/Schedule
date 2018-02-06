@@ -1,5 +1,8 @@
+import os
+import re
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
+from flask_jsglue import JSGlue
 from flask_session import Session
 from passlib.apps import custom_app_context as pwd_context
 from tempfile import mkdtemp
@@ -9,6 +12,7 @@ from helpers import *
 
 # configure application
 app = Flask(__name__)
+JSGlue(app)
 
 # ensure responses aren't cached
 if app.config["DEBUG"]:
@@ -34,7 +38,11 @@ db = SQL("sqlite:///sr.db")
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html")
+    """Render map."""
+    #if not os.environ.get("API_KEY"):
+        #raise RuntimeError("API_KEY not set")
+    #return render_template("index.html", key=os.environ.get("API_KEY"))
+    return redirect("/schedule")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -264,12 +272,82 @@ def schedule():
 
     if request.method =="GET":
         # get data from tables: users, techs, rigs
-        sched = db.execute("SELECT * FROM users INNER JOIN rigs ON rigs.rig_id = users.rigid ORDER BY last_name")
+        set1 = db.execute("SELECT * FROM users WHERE rotation=1 ORDER BY last_name")
+        set2 = db.execute("SELECT * FROM users WHERE rotation=2 ORDER BY last_name")
+        set3 = db.execute("SELECT * FROM users WHERE rotation=3 ORDER BY last_name")
+        rignames = db.execute("SELECT * FROM rigs ORDER BY rig_name")
 
         # render
         return render_template("schedule.html",
-        sched = sched)
+        set1 = set1,
+        set2 = set2,
+        set3 = set3,
+        rignames = rignames)
+
+        #jsonify(sched)) GET THIS PART TO WORK !!!
+
 
     if request.method =="POST":
 
         return redirect("/rigs")
+
+"""---------------------------------------------------------------"""
+""" Functions for Maps page """
+""" Everything below is for maps """
+"""---------------------------------------------------------------"""
+
+@app.route("/search")
+def search():
+    """Search for places that match query."""
+
+    q = request.args.get("q") + "%"
+    place = db.execute("""SELECT * FROM places WHERE postal_code LIKE :q
+    OR place_name LIKE :q
+    OR admin_code1 LIKE :q""", q=q)
+    return jsonify(place)
+
+@app.route("/update")
+def update():
+    """Find up to 10 places within view."""
+
+    # ensure parameters are present
+    if not request.args.get("sw"):
+        raise RuntimeError("missing sw")
+    if not request.args.get("ne"):
+        raise RuntimeError("missing ne")
+
+    # ensure parameters are in lat,lng format
+    if not re.search("^-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$", request.args.get("sw")):
+        raise RuntimeError("invalid sw")
+    if not re.search("^-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$", request.args.get("ne")):
+        raise RuntimeError("invalid ne")
+
+    # explode southwest corner into two variables
+    (sw_lat, sw_lng) = [float(s) for s in request.args.get("sw").split(",")]
+
+    # explode northeast corner into two variables
+    (ne_lat, ne_lng) = [float(s) for s in request.args.get("ne").split(",")]
+
+    # find 10 cities within view, pseudorandomly chosen if more within view
+    if (sw_lng <= ne_lng):
+
+        # doesn't cross the antimeridian
+        rows = db.execute("""SELECT * FROM places
+            WHERE :sw_lat <= latitude AND latitude <= :ne_lat AND (:sw_lng <= longitude AND longitude <= :ne_lng)
+            GROUP BY country_code, place_name, admin_code1
+            ORDER BY RANDOM()
+            LIMIT 10""",
+            sw_lat=sw_lat, ne_lat=ne_lat, sw_lng=sw_lng, ne_lng=ne_lng)
+
+    else:
+
+        # crosses the antimeridian
+        rows = db.execute("""SELECT * FROM places
+            WHERE :sw_lat <= latitude AND latitude <= :ne_lat AND (:sw_lng <= longitude OR longitude <= :ne_lng)
+            GROUP BY country_code, place_name, admin_code1
+            ORDER BY RANDOM()
+            LIMIT 10""",
+            sw_lat=sw_lat, ne_lat=ne_lat, sw_lng=sw_lng, ne_lng=ne_lng)
+
+    # output places as JSON
+    return jsonify(rows)

@@ -10,35 +10,65 @@
 		<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet"/>
 		<script src="{{ url_for('static', filename='redips-drag-min.js') }}"></script>
 		<script src="{{ url_for('static', filename='script.js') }}"></script>
-		<title>Testing 123</title>
+		<!-- Bootstrap Date-Picker Plugin -->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+		<!-- http://stewartjpark.com/Flask-JSGlue/ -->
+        {{ JSGlue.include() }}
+		<title>Schedule</title>
 	</head>
-    <form action="{{ url_for('schedule') }}" method="post">
+    <form action="{{ url_for('schedule') }}" method="post" id="sched">
     	<fieldset>
 			<body onload="REDIPS.drag.init()">
+      			<!-- Date input -->
+      			<div id='datepicker'></div>
+
 				<!-- tables inside this DIV could have drag-able content -->
 				<div id="redips-drag">
-					<!-- left container -->
-					<div id="left">
-						<table id="table1">
+
+					<!-- set 1 container -->
+					<div id="techs">
+						<table id="daysOff">
 							<colgroup>
+								<col width="100"/> <!--  first activity column -->
+								<col width="100"/> <!--  second activity column -->
 								<col width="100"/>
 							</colgroup>
-							{% for techs in sched %}
 							<tr>
+								<td class="redips-mark">Set1</td>
+								<td class="redips-mark">Set2</td>
+								<td class="redips-mark">Set3</td>
+							</tr>
+							{% for techs in set1 %}
+								<tr>
 								<td class="redips-single">
-									<div id="a" class="redips-drag redips-clone blue">{{ techs.first_name }}</div>
+									<div id="{{ techs.rig_name }}_{{ techs.rotation }}" class="redips-drag redips-drag blue">{{ techs.first_name }} {{ techs.last_name }}</div>
 								</td>
-							</tr>
+								</tr>
 							{% endfor %}
-							<tr>
-								<td class="redips-trash">Remove</td>
-							</tr>
+							<td>
+							{% for techs in set2 %}
+								<tr>
+								<td class="redips-single">
+									<div id="{{ techs.rig_name }}_{{ techs.rotation }}" class="redips-drag redips-drag blue">{{ techs.first_name }} {{ techs.last_name }}</div>
+								</td>
+								</tr>
+							{% endfor %}
+							</td>
+							<td>
+							{% for techs in set3 %}
+								<tr>
+								<td class="redips-single">
+									<div id="{{ techs.rig_name }}_{{ techs.rotation }}" class="redips-drag redips-drag blue">{{ techs.first_name }} {{ techs.last_name }}</div>
+								</td>
+								</tr>
+							{% endfor %}
+							</td>
 						</table>
 					</div>
-
 					<!-- right container -->
-					<div id="right">
-						<table id="table2">
+					<div id="rigs">
+						<table id="schedule">
 							<colgroup>
 								<col width="100"/> <!--  first activity column -->
 								<col width="100"/> <!--  second activity column -->
@@ -46,14 +76,15 @@
 								<col width="100"/>
 							</colgroup>
 							<tr>
-								<td class="redips-mark dark">Rig</td>
-								<td class="redips-mark dark">Days</td>
-								<td class="redips-mark dark">Nights</td>
-								<td class="redips-mark dark">Other</td>
+								<td class="redips-mark">Rig</td>
+								<td class="redips-mark">Days</td>
+								<td class="redips-mark">Nights</td>
+								<td class="redips-mark">Other</td>
 							</tr>
-							{% for rigs in sched %}
+							{% for rigs in rignames %}
 							<tr>
-								<td class="redips-mark dark">{{ rigs.rig_name }}</td>
+								<td>{{ rigs.rig_name }}</td>
+								<td><div id="{{ rigs.rig_name }}"></div></td>
 								<td id="td1"></td>
 								<td id="td2"></td>
 								<td id="td3"></td>
@@ -62,10 +93,10 @@
 							{% endfor %}
 						</table>
 					</div>
-
-					<!-- display block content -->
-					<div id="message"/>
 				</div>
+				<input id="save-button" type="button" value="Save" class="button" onclick="redips.save()" title="Save form"/>
+				<input id="load-button" type="button" value="Load" class="button" onclick="redips.load()" title="Load form"/>
+				<div id="message"/>
 			</body>
 		</fieldset>
 	</form>
